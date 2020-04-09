@@ -6,7 +6,7 @@
         AzInfo typically writes temp data to a folder of your choice i.e. C:\temp. It also zips up the final results.
 #>
 param (
-    $ConfigLabel = "PS-EXT-MGMTPLANE-MGMT-USE"
+    $ConfigLabel = "AzCloud-Prod-RG"
 )
 
 If ((Get-Command Get-AutomationConnection -ErrorAction SilentlyContinue)) {
@@ -83,8 +83,8 @@ Switch ($ConfigLabel) {
             CreateBuildSheet = @{
                 Execute = $false
             }
-        } # End AllSubsAndRGs ScriptControl
-    } # End AllSubsAndRGs
+        } # End ScriptControl
+    } # Env ConfigLabel 
     MAG-Prod{
         $Subs = Get-AzSubscription -SubscriptionName "Azure Government Internal"
         Set-AzContext -SubscriptionId $Subs.SubscriptionId | Out-Null
@@ -115,8 +115,8 @@ Switch ($ConfigLabel) {
                     StorageAccountContainer = "azinfo"
                 }
             }
-        } # End ScriptControl Prod
-    } # End Prod
+        } # End ScriptControl 
+    } # End Env ConfigLabel 
     AzCloud-Prod-RG{
         $Subs = Get-AzSubscription -SubscriptionID "3ba3ebad-7974-4e80-a019-3a61e0b7fa91"
         Set-AzContext -SubscriptionId $Subs.SubscriptionId | Out-Null
@@ -147,12 +147,12 @@ Switch ($ConfigLabel) {
                     StorageAccountContainer = "azinfo"
                 }
             }
-        } # End ScriptControl Prod
-    } # End Prod
-    PS-EXT-MGMTPLANE-MGMT-USE{
+        } # End ScriptControl
+    } # End Env ConfigLabel 
+    ACME-EXT-MGMTPLANE-MGMT-USE{
         $Subs = Get-AzSubscription -SubscriptionID "2918909d-37c3-4acd-87ec-480b42826789"
         Set-AzContext -SubscriptionId $Subs.SubscriptionId | Out-Null
-        $RGs = Get-AzResourceGroup 
+        $RGs = Get-AzResourceGroup -Name "XXXX"
 
         $ScriptControl = @{
             GetAzInfo = @{
@@ -172,8 +172,8 @@ Switch ($ConfigLabel) {
             ExportAzInfoToBlobStorage = @{
                 Execute = $false
             }
-        } # End ScriptControl Prod
-    } # End Prod
+        } # End ScriptControl
+    } # End Env ConfigLabel 
 
 } # End Switch ConfigLabel
 
