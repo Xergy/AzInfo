@@ -6,7 +6,7 @@
         AzInfo typically writes temp data to a folder of your choice i.e. C:\temp. It also zips up the final results.
 #>
 param (
-    $ConfigLabel = "AzCloud-Prod-RG"
+    $ConfigLabel = "AllSubsAndRGs"
 )
 
 If ((Get-Command Get-AutomationConnection -ErrorAction SilentlyContinue)) {
@@ -32,35 +32,27 @@ $VerbosePreference = "SilentlyContinue"
 Import-Module Az 
 $VerbosePreference = "Continue"
 
-#$ScriptDir = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition) 
-#Set-Location $ScriptDir
-
-#Reload AzInfo Module
-#If (get-module AzInfo) {Remove-Module AzInfo}
-#Import-Module .\Modules\AzInfo
-
-#if not logged in to Azure, start login
-#if ($Null -eq (Get-AzContext).Account) {
-#Connect-AzAccount -Environment AzureUSGovernment | Out-Null}
-
-Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Gathering Sub and RG Info..."
-$SubsAll = Get-AzSubscription
-$RGsAll = @()
-
-# foreach ( $Sub in $SubsAll ) {
-#     Set-AzContext -SubscriptionId $Sub.SubscriptionId | Out-Null
-#     $SubRGs = Get-AzResourceGroup
-#     $RGsAll = $RGsAll + $SubRGs 
-# }
-
 # Find TempPath for local files
 $TempPath = If ($AzureAutomation) {$env:Temp}
 Else {"C:\Temp"}
+Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) TempPath: $($TempPath )"
 
+Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) ConfigLabel: $($ConfigLabel)"
 Switch ($ConfigLabel) {
     AllSubsAndRGs {
-        $Subs = $SubsAll
-        $RGs = $RGsAll
+        Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Gathering Sub and RG Info..."
+            $SubsAll = Get-AzSubscription
+            $RGsAll = @()
+
+            foreach ( $Sub in $SubsAll ) {
+                Set-AzContext -SubscriptionId $Sub.SubscriptionId | Out-Null
+                $SubRGs = Get-AzResourceGroup
+                $RGsAll += $SubRGs 
+            }
+
+            $Subs = $SubsAll
+            $RGs = $RGsAll
+        Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Gathering Sub and RG Info - Done! Total Subs:$($Subs.Count) RGs:$($RGs.Count)"
 
         $ScriptControl = @{
             GetAzInfo = @{
@@ -146,31 +138,6 @@ Switch ($ConfigLabel) {
                     StorageAccountName =  "prodrgdiag"       
                     StorageAccountContainer = "azinfo"
                 }
-            }
-        } # End ScriptControl
-    } # End Env ConfigLabel 
-    ACME-EXT-MGMTPLANE-MGMT-USE{
-        $Subs = Get-AzSubscription -SubscriptionID "2918909d-37c3-4acd-87ec-480b42826789"
-        Set-AzContext -SubscriptionId $Subs.SubscriptionId | Out-Null
-        $RGs = Get-AzResourceGroup -Name "XXXX"
-
-        $ScriptControl = @{
-            GetAzInfo = @{
-                Execute = $true
-                Params = @{
-                    Subscription = $Subs
-                    ResourceGroup = $RGs
-                    ConfigLabel = $ConfigLabel
-                }
-            }
-            ExportAzInfo = @{
-                Execute = $true
-                Params = @{                    
-                    LocalPath = $TempPath   
-                    }                
-            }
-            ExportAzInfoToBlobStorage = @{
-                Execute = $false
             }
         } # End ScriptControl
     } # End Env ConfigLabel 
