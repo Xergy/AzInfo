@@ -27,42 +27,32 @@ Else {Write-Output ("Azure Automation commands missing, skipping Azure RunAs Con
 Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Starting..."
 
 $VerbosePreference = "Continue"
-
 Import-Module .\Modules\AzInfo -Force
-
-#$ScriptDir = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition) 
-#Set-Location $ScriptDir
-
-#Reload AzInfo Module
-#If (get-module AzInfo) {Remove-Module AzInfo}
-#Import-Module .\Modules\AzInfo
-
-#if not logged in to Azure, start login
-#if ($Null -eq (Get-AzContext).Account) {
-#Connect-AzAccount -Environment AzureUSGovernment | Out-Null}
-
-
-$SubsAll = Get-AzSubscription
-$RGsAll = @()
-
-foreach ( $Sub in $SubsAll ) {
-
-    Set-AzContext -SubscriptionId $Sub.SubscriptionId | Out-Null
-  
-    $SubRGs = Get-AzResourceGroup
-
-    $RGsAll = $RGsAll + $SubRGs 
-
-}
+$VerbosePreference = "SilentlyContinue"
+Import-Module Az 
+$VerbosePreference = "Continue"
 
 # Find TempPath for local files
 $TempPath = If ($AzureAutomation) {$env:Temp}
 Else {"C:\Temp"}
+Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) TempPath: $($TempPath )"
 
+Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) ConfigLabel: $($ConfigLabel)"
 Switch ($ConfigLabel) {
     AllSubsAndRGs {
-        $Subs = $SubsAll
-        $RGs = $RGsAll
+        Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Gathering Sub and RG Info..."
+            $SubsAll = Get-AzSubscription
+            $RGsAll = @()
+
+            foreach ( $Sub in $SubsAll ) {
+                Set-AzContext -SubscriptionId $Sub.SubscriptionId | Out-Null
+                $SubRGs = Get-AzResourceGroup
+                $RGsAll += $SubRGs 
+            }
+
+            $Subs = $SubsAll
+            $RGs = $RGsAll
+        Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Gathering Sub and RG Info - Done! Total Subs:$($Subs.Count) RGs:$($RGs.Count)"
 
         $ScriptControl = @{
             GetAzInfo = @{
@@ -85,9 +75,9 @@ Switch ($ConfigLabel) {
             CreateBuildSheet = @{
                 Execute = $false
             }
-        } # End AllSubsAndRGs ScriptControl
-    } # End AllSubsAndRGs
-    Prod{
+        } # End ScriptControl
+    } # Env ConfigLabel 
+    MAG-Prod{
         $Subs = Get-AzSubscription -SubscriptionName "Azure Government Internal"
         Set-AzContext -SubscriptionId $Subs.SubscriptionId | Out-Null
         $RGs = Get-AzResourceGroup -ResourceGroupName "prod-rg"
@@ -117,8 +107,40 @@ Switch ($ConfigLabel) {
                     StorageAccountContainer = "azinfo"
                 }
             }
-        } # End ScriptControl Prod
-    } # End Prod
+        } # End ScriptControl 
+    } # End Env ConfigLabel 
+    AzCloud-Prod-RG{
+        $Subs = Get-AzSubscription -SubscriptionID "3ba3ebad-7974-4e80-a019-3a61e0b7fa91"
+        Set-AzContext -SubscriptionId $Subs.SubscriptionId | Out-Null
+        $RGs = Get-AzResourceGroup -ResourceGroupName "prod-rg"
+
+        $ScriptControl = @{
+            GetAzInfo = @{
+                Execute = $true
+                Params = @{
+                    Subscription = $Subs
+                    ResourceGroup = $RGs
+                    ConfigLabel = $ConfigLabel
+                }
+            }
+            ExportAzInfo = @{
+                Execute = $true
+                Params = @{                    
+                    LocalPath = $TempPath   
+                    }                
+            }
+            ExportAzInfoToBlobStorage = @{
+                Execute = $false
+                Params = @{    
+                    LocalPath = $TempPath
+                    StorageAccountSubID = "3ba3ebad-7974-4e80-a019-3a61e0b7fa91"
+                    StorageAccountRG = "prod-rg"        
+                    StorageAccountName =  "prodrgdiag"       
+                    StorageAccountContainer = "azinfo"
+                }
+            }
+        } # End ScriptControl
+    } # End Env ConfigLabel 
 
 } # End Switch ConfigLabel
 
