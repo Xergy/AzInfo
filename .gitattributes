@@ -1,0 +1,9 @@
+*.java diff
+*.js diff
+*.pl diff
+*.txt diff
+*.ts diff
+*.html diff
+*.ps1
+*.ps1m
+*.psd1
