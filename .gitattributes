@@ -4,6 +4,6 @@
 *.txt diff
 *.ts diff
 *.html diff
-*.ps1
-*.ps1m
-*.psd1
+*.ps1 diff
+*.ps1m diff
+*.psd1 diff
