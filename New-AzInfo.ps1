@@ -24,7 +24,7 @@ If ((Get-Command Get-AutomationConnection -ErrorAction SilentlyContinue)) {
 }
 Else {Write-Output ("Azure Automation commands missing, skipping Azure RunAs Connection...")}
 
-Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Starting..."
+Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.ss) Starting..."
 
 $VerbosePreference = "Continue"
 Import-Module .\Modules\AzInfo -Force
@@ -35,12 +35,12 @@ $VerbosePreference = "Continue"
 # Find TempPath for local files
 $TempPath = If ($AzureAutomation) {$env:Temp}
 Else {"C:\Temp"}
-Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) TempPath: $($TempPath )"
+Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.ss) TempPath: $($TempPath )"
 
-Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) ConfigLabel: $($ConfigLabel)"
+Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.ss) ConfigLabel: $($ConfigLabel)"
 Switch ($ConfigLabel) {
     AllSubsAndRGs {
-        Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Gathering Sub and RG Info..."
+        Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.ss) Gathering Sub and RG Info..."
             $SubsAll = Get-AzSubscription
             $RGsAll = @()
 
@@ -52,7 +52,7 @@ Switch ($ConfigLabel) {
 
             $Subs = $SubsAll
             $RGs = $RGsAll
-        Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Gathering Sub and RG Info - Done! Total Subs:$($Subs.Count) RGs:$($RGs.Count)"
+        Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.ss) Gathering Sub and RG Info - Done! Total Subs:$($Subs.Count) RGs:$($RGs.Count)"
 
         $ScriptControl = @{
             GetAzInfo = @{
@@ -146,7 +146,7 @@ Switch ($ConfigLabel) {
 
 If ($ScriptControl.GetAzInfo.Execute) {
 
-    Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Running Get-AzInfo..."
+    Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.ss) Running Get-AzInfo..."
 
     $Params = $ScriptControl.GetAzInfo.Params
 
@@ -157,7 +157,7 @@ If ($ScriptControl.GetAzInfo.Execute) {
 
 If ($ScriptControl.ExportAzInfo.Execute) {
     
-    Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Running Export-AzInfo..."
+    Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.ss) Running Export-AzInfo..."
 
     $Params = $ScriptControl.ExportAzInfo.Params
     $Params.AzInfoResults = $AzInfoResults
@@ -168,7 +168,7 @@ If ($ScriptControl.ExportAzInfo.Execute) {
 
 If ($ScriptControl.ExportAzInfoToBlobStorage.Execute) {
 
-    Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Running Export-AzInfoToBlobStorage..."
+    Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.ss) Running Export-AzInfoToBlobStorage..."
 
     $Params = $ScriptControl.ExportAzInfoToBlobStorage.Params
     $Params.AzInfoResults = $AzInfoResults
@@ -180,4 +180,4 @@ If ($ScriptControl.ExportAzInfoToBlobStorage.Execute) {
 # Post Processing...
 # if any...
 
-Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.fff) Done!"
+Write-Output "$(Get-Date -Format yyyy-MM-ddTHH.mm.ss) Done!"
