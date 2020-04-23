@@ -52,7 +52,7 @@ param (
 ```
 >  The script is configured this way, so you only have to feed one param to it from runbook execution, and all the nasty details of the envs are stored and managed in the ```New-AzInfo.ps1``` script (ultimately in source control).  All the work is being performed by modules.
 
-- Below are the most important actions at are controled by ```New-AzInfo.ps1```:
+- Below are the most important actions at are controlled by ```New-AzInfo.ps1```:
 
   - GetAzInfo
     - Performs data gathering and returns AzInfoResults Object
@@ -63,7 +63,7 @@ param (
 
 ## Tips and Tricks
 
-- As it appears in the repo if you just run ```New-AzInfo.ps1``` using F5 in VSCode it will create a local copy of all IAM's data that your Azure account can see.
+- As it appears in the repo if you just run ```New-AzInfo.ps1``` using F5 in VSCode it will create a local copy of all data that your Azure account can see.
 - Runs locally and from Runbook.  Please clone, don't copy, the repo down to your machine.  Execute with VSCode.
 
 ## Next Steps
