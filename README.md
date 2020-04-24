@@ -63,7 +63,7 @@ param (
 
 ## Tips and Tricks
 
-- As it appears in the repo if you just run ```New-AzInfo.ps1``` using F5 in VSCode it will create a local copy of all data that your Azure account can see.
+- As it appears in the repo, if you just run ```New-AzInfo.ps1``` by pressing F5 in VSCode, it will create a local copy of all data that your Azure account can see.
 - Runs locally and from Runbook.  Please clone, don't copy, the repo down to your machine.  Execute with VSCode.
 
 ## Next Steps
